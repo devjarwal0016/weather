@@ -8,7 +8,7 @@ export class WeatherService implements OnModuleInit {
   constructor(private telegramService: TelegramService) {}
 
   onModuleInit() {
-    cron.schedule('*/5 * * * *', () => {
+    cron.schedule('0 */6 * * *', () => {
       this.checkWeather();
     });
   }
@@ -24,18 +24,30 @@ export class WeatherService implements OnModuleInit {
   }
 
   async fetchWeather() {
-    const apiKey = process.env.WEATHER_API_KEY || 'dummy';
-    try {
-      const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=London&appid=${apiKey}`
-      );
-      const data = await response.json();
-      return {
-        temp: Math.round(data.main.temp - 273.15),
-        description: data.weather[0].description,
-      };
-    } catch {
-      return { temp: 'N/A', description: 'Unknown' };
-    }
+  const apiKey = process.env.WEATHER_API_KEY;
+  if (!apiKey) {
+    console.log('⚠️ No weather API key found');
+    return { temp: 'N/A', description: 'No API key' };
   }
+
+  try {
+    const response = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?q=London&appid=${apiKey}&units=metric`
+    );
+    const data = await response.json();
+    
+    if (data.cod === 401) {
+      console.log('❌ Invalid weather API key');
+      return { temp: 'N/A', description: 'Invalid API key' };
+    }
+    
+    return {
+      temp: Math.round(data.main.temp),
+      description: data.weather[0].description,
+    };
+  } catch (error) {
+    // console.log('Weather API error:', error.message);
+    return { temp: 'N/A', description: 'API error' };
+  }
+}
 }

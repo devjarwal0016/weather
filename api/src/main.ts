@@ -1,21 +1,18 @@
+import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import mongoose from 'mongoose';
 import * as dotenv from 'dotenv';
+import { AppModule } from './app.module';
 
 dotenv.config();
 
 async function bootstrap() {
-  try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/weatherguard');
-    console.log('✅ Connected to MongoDB');
-  } catch (error) {
-    console.log('❌ MongoDB connection error:', (error as any).message);
-  }
-
   const app = await NestFactory.create(AppModule);
+  const logger = new Logger('Bootstrap');
+  const port = Number(process.env.PORT) || 5000;
+
   app.enableCors();
-  await app.listen(5000);
-  console.log('🚀 Backend running on http://localhost:5000');
+  await app.listen(port);
+  logger.log(`Backend running on http://localhost:${port}`);
 }
+
 bootstrap();

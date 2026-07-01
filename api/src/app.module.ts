@@ -1,10 +1,12 @@
-import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { Logger, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './modules/auth/auth.module';
-import { UsersModule } from './modules/users/users.module';
 import { TelegramModule } from './modules/telegram/telegram.module';
+import { UsersModule } from './modules/users/users.module';
 import { WeatherModule } from './modules/weather/weather.module';
+
+const logger = new Logger('MongoDB');
 
 @Module({
   imports: [
@@ -14,7 +16,7 @@ import { WeatherModule } from './modules/weather/weather.module';
     }),
     MongooseModule.forRoot(process.env.MONGODB_URI, {
       connectionFactory: (connection) => {
-        console.log('✅ Connected to MongoDB');
+        logger.log('Connected to MongoDB');
         return connection;
       },
     }),
