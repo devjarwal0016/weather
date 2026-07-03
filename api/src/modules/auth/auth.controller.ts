@@ -15,8 +15,12 @@ export class AuthController {
   async googleCallback(@Req() req, @Res() res) {
     const user = req.user;
     const loginData = await this.authService.login(user);
+    
+    // Use environment variable for frontend URL
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    
     return res.redirect(
-      `http://localhost:3000/auth/callback?token=${loginData.access_token}&user=${encodeURIComponent(
+      `${frontendUrl}/auth/callback?token=${loginData.access_token}&user=${encodeURIComponent(
         JSON.stringify(loginData.user)
       )}`
     );
@@ -31,8 +35,12 @@ export class AuthController {
   async githubCallback(@Req() req, @Res() res) {
     const user = req.user;
     const loginData = await this.authService.login(user);
+    
+    // Use environment variable for frontend URL
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    
     return res.redirect(
-      `http://localhost:3000/auth/callback?token=${loginData.access_token}&user=${encodeURIComponent(
+      `${frontendUrl}/auth/callback?token=${loginData.access_token}&user=${encodeURIComponent(
         JSON.stringify(loginData.user)
       )}`
     );

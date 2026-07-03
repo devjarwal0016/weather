@@ -2,12 +2,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 function Login() {
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
   const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:5000/auth/google';
+    window.location.href = `${API_URL}/auth/google`;
   };
 
   const handleGithubLogin = () => {
-    window.location.href = 'http://localhost:5000/auth/github';
+    window.location.href = `${API_URL}/auth/github`;
   };
 
   return (
