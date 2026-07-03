@@ -35,8 +35,10 @@ function AdminDashboard({ user, token }) {
       return;
     }
 
-    // Simple admin check by email
-    if (!user.email.includes('admin') && !user.email.includes('@gmail.com')) {
+    const adminEmails = (process.env.REACT_APP_ADMIN_EMAILS || '').split(',').map(email => email.trim());
+    
+    // Check if user is admin
+    if (!adminEmails.includes(user.email)) {
       alert('You are not an admin!');
       navigate('/');
       return;
