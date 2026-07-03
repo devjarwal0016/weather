@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function AdminDashboard({ user, token }) {
@@ -6,6 +6,7 @@ function AdminDashboard({ user, token }) {
   const [pendingUsers, setPendingUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const hasCheckedAdmin = useRef(false); // ✅ Prevent infinite loop
 
   const fetchPendingUsers = useCallback(async () => {
     try {
@@ -27,14 +28,19 @@ function AdminDashboard({ user, token }) {
       console.log('Failed to fetch users:', err);
       setLoading(false);
     }
-  }, [token]); // token is a dependency
+  }, [token]);
 
   useEffect(() => {
+    // ✅ Only run once
+    if (hasCheckedAdmin.current) return;
+    hasCheckedAdmin.current = true;
+
     if (!user || !token) {
       navigate('/login');
       return;
     }
 
+    // Get admin emails from environment variable
     const adminEmails = (process.env.REACT_APP_ADMIN_EMAILS || '').split(',').map(email => email.trim());
     
     // Check if user is admin
@@ -46,7 +52,7 @@ function AdminDashboard({ user, token }) {
 
     setIsAdmin(true);
     fetchPendingUsers();
-  }, [user, token, navigate, fetchPendingUsers]); 
+  }, [user, token, navigate, fetchPendingUsers]);
 
   const approveUser = async (userId) => {
     try {
