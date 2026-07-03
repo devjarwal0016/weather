@@ -9,7 +9,8 @@
     "prebuild": "npm run clean",
     "start": "node dist/main",
     "start:dev": "nest start --watch",
-    "build": "npx nest build"
+    "build": "npx nest build",
+    "build:render": "node node_modules/@nestjs/cli/bin/nest.js build"
   },
   "keywords": [],
   "author": "",
