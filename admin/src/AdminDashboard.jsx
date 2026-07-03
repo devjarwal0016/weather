@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function AdminDashboard({ user, token }) {
@@ -7,26 +7,9 @@ function AdminDashboard({ user, token }) {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  useEffect(() => {
-    if (!user || !token) {
-      navigate('/login');
-      return;
-    }
-
-    // Simple admin check by email
-    if (!user.email.includes('admin') && !user.email.includes('@gmail.com')) {
-      alert('You are not an admin!');
-      navigate('/');
-      return;
-    }
-
-    setIsAdmin(true);
-    fetchPendingUsers();
-  }, [user, token]);
-
-  const fetchPendingUsers = async () => {
+  const fetchPendingUsers = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:5000/users/pending', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/users/pending`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -44,11 +27,28 @@ function AdminDashboard({ user, token }) {
       console.log('Failed to fetch users:', err);
       setLoading(false);
     }
-  };
+  }, [token]); // token is a dependency
+
+  useEffect(() => {
+    if (!user || !token) {
+      navigate('/login');
+      return;
+    }
+
+    // Simple admin check by email
+    if (!user.email.includes('admin') && !user.email.includes('@gmail.com')) {
+      alert('You are not an admin!');
+      navigate('/');
+      return;
+    }
+
+    setIsAdmin(true);
+    fetchPendingUsers();
+  }, [user, token, navigate, fetchPendingUsers]); 
 
   const approveUser = async (userId) => {
     try {
-      const response = await fetch('http://localhost:5000/users/approve', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/users/approve`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -114,7 +114,7 @@ function AdminDashboard({ user, token }) {
         <button 
           onClick={async () => {
             try {
-              await fetch('http://localhost:5000/weather/trigger', {
+              await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/weather/trigger`, {
                 method: 'POST',
                 headers: {
                   'Authorization': `Bearer ${token}`,
